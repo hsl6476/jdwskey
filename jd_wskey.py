@@ -249,57 +249,7 @@ def get_ck():  # 方法 获取 JD_COOKIE值 [系统变量传递] <! 此方法未
 
 # 返回值 bool
 def check_ck(ck):  # 方法 检查 Cookie有效性 使用变量传递 单次调用
-    searchObj = re.search(r'pt_pin=([^;\s]+)', ck, re.M | re.I)  # 正则检索 pt_pin
-    if searchObj:  # 真值判断
-        pin = searchObj.group(1)  # 取值
-    else:  # 判断分支
-        pin = ck.split(";")[1]  # 取值 使用 ; 分割
-    if "WSKEY_UPDATE_HOUR" in os.environ:  # 判断 WSKEY_UPDATE_HOUR是否存在于环境变量
-        updateHour = 23  # 更新间隔23小时
-        if os.environ["WSKEY_UPDATE_HOUR"].isdigit():  # 检查是否为 DEC值
-            updateHour = int(os.environ["WSKEY_UPDATE_HOUR"])  # 使用 int化数字
-        nowTime = time.time()  # 获取时间戳 赋值
-        updatedAt = 0.0  # 赋值
-        searchObj = re.search(r'__time=([^;\s]+)', ck, re.M | re.I)  # 正则检索 [__time=]
-        if searchObj:  # 真值判断
-            updatedAt = float(searchObj.group(1))  # 取值 [float]类型
-        if nowTime - updatedAt >= (updateHour * 60 * 60) - (10 * 60):  # 判断时间操作
-            logger.info(str(pin) + ";即将到期或已过期\n")  # 标准日志输出
-            return False  # 返回 Bool类型 False
-        else:  # 判断分支
-            remainingTime = (updateHour * 60 * 60) - (nowTime - updatedAt)  # 时间运算操作
-            hour = int(remainingTime / 60 / 60)  # 时间运算操作 [int]
-            minute = int((remainingTime % 3600) / 60)  # 时间运算操作 [int]
-            logger.info(str(pin) + ";未到期，{0}时{1}分后更新\n".format(hour, minute))  # 标准日志输出
-            return True  # 返回 Bool类型 True
-    elif "WSKEY_DISCHECK" in os.environ:  # 判断分支 WSKEY_DISCHECK 是否存在于系统变量
-        logger.info("不检查账号有效性\n--------------------\n")  # 标准日志输出
-        return False  # 返回 Bool类型 False
-    else:  # 判断分支
-        url = 'https://me-api.jd.com/user_new/info/GetJDUserInfoUnion'  # 设置JD_API接口地址
-        headers = {
-            'Cookie': ck,
-            'Referer': 'https://home.m.jd.com/myJd/home.action',
-            'user-agent': ua
-        }  # 设置 HTTP头
-        try:  # 异常捕捉
-            res = requests.get(url=url, headers=headers, verify=False, timeout=10)  # 进行 HTTP请求[GET] 超时 10秒
-        except Exception as err:  # 异常捕捉
-            logger.debug(str(err))  # 调试日志输出
-            logger.info("JD接口错误 请重试或者更换IP")  # 标准日志输出
-            return False  # 返回 Bool类型 False
-        else:  # 判断分支
-            if res.status_code == 200:  # 判断 JD_API 接口是否为 200 [HTTP_OK]
-                code = int(json.loads(res.text)['retcode'])  # 使用 Json模块对返回数据取值 int([retcode])
-                if code == 0:  # 判断 code值
-                    logger.info(str(pin) + ";状态正常\n")  # 标准日志输出
-                    return True  # 返回 Bool类型 True
-                else:  # 判断分支
-                    logger.info(str(pin) + ";状态失效\n")
-                    return False  # 返回 Bool类型 False
-            else:  # 判断分支
-                logger.info("JD接口错误码: " + str(res.status_code))  # 标注日志输出
-                return False  # 返回 Bool类型 False
+    return False
 
 
 # 返回值 bool jd_ck
